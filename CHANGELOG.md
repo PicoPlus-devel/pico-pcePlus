@@ -1,6 +1,6 @@
 # CHANGELOG
 
-Recently played list, no re-flash of a rom already in flash, SNES controller support on the GPIO port, and PicoNES PCB design v2.6.
+Maintenance release: updates the shared menu and support code. Fixes a black screen on DVI-only monitors and makes start-up steadier. The emulator itself is unchanged.
 
 # General Info
 
@@ -10,6 +10,15 @@ Recently played list, no re-flash of a rom already in flash, SNES controller sup
 
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
+
+# v0.5
+
+A maintenance release. It brings the shared menu and support code up to date; the emulator itself is unchanged. Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and save states on the SD card are untouched.
+
+## Fixes
+
+- **DVI-only monitors show a picture again.** With **Display Mode** set to DVI, some older screens that accept DVI but not HDMI stayed black. They work again.
+- **Steadier start-up.** The board lets its power settle before switching to the higher clock speed.
 
 # v0.4
 
