@@ -52,7 +52,8 @@ SaveStateTypes quickSaveAction = SaveStateTypes::NONE;
 static uint32_t start_tick_us = 0;
 static uint32_t fps = 0;
 static uint8_t framesbeforeAutoStateIsLoaded = 0;
-static char fpsString[3] = "00";
+static char fpsString[16] = "00";
+static int fpsStringLen = 2;
 
 #define AUDIOBUFFERSIZE 4096
 #define PCE_AUDIO_RATE 44100
@@ -267,7 +268,7 @@ extern "C" void __not_in_flash_func(osd_gfx_lines_rendered)(int first_line, int 
     {
         WORD *fpsBuffer = dst + current_x_offset + 4;
         int rowInChar = display_y - current_y_offset - FPSSTART;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < fpsStringLen; i++)
         {
             char fontSlice = getcharslicefrom8x8font(fpsString[i], rowInChar);
             for (int bit = 0; bit < 8; bit++)
@@ -542,8 +543,27 @@ static inline int ProcessAfterFrameIsRendered()
             fps = (fpsFrames * 1000000ull + elapsed_us / 2) / elapsed_us;
             fpsFrames = 0;
             start_tick_us = Frens::time_us();
-            fpsString[0] = '0' + (fps / 10);
-            fpsString[1] = '0' + (fps % 10);
+            int nchars = 0;
+            fpsString[nchars++] = '0' + (fps / 10);
+            fpsString[nchars++] = '0' + (fps % 10);
+#if HSTX
+            // Append the HSTX auto-resync count so display glitches are visible.
+            fpsString[nchars++] = ' ';
+            fpsString[nchars++] = 'R';
+            int resync = get_video_output_resync_count();
+            char digits[10];
+            int nd = 0;
+            do
+            {
+                digits[nd++] = '0' + (resync % 10);
+                resync /= 10;
+            } while (resync > 0 && nd < (int)sizeof(digits));
+            while (nd > 0 && nchars < (int)sizeof(fpsString))
+            {
+                fpsString[nchars++] = digits[--nd];
+            }
+#endif
+            fpsStringLen = nchars;
         }
     }
 #if WII_PIN_SDA >= 0 and WII_PIN_SCL >= 0
