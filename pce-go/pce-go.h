@@ -121,6 +121,8 @@ typedef const struct
 
 extern const char SAVESTATE_HEADER[8];
 extern save_var_t SaveStateVars[];
+extern save_var_t SgxSaveStateVars[];
+extern save_var_t CdSaveStateVars[];
 
 extern int osd_gfx_render_line;
 
