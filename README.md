@@ -24,6 +24,7 @@ This project is part of a family of Raspberry Pi Pico emulator projects:
 - **CD-ROM²** — CD-ROM² and Super CD-ROM² games are supported, including CD-DA audio playback and ADPCM streaming. CD-ROM² playback requires PSRAM and a System Card BIOS supplied by the user.
 - **Audio CDs** — Regular music CDs can be played with the CD player built into the System Card BIOS. Put a CUE/BIN or CHD image of a music CD on the SD card and start it like a CD game: the track list appears and playback, track skip, pause and the level meters all work.
 - **Save states** — Manual save and load slots are available through the in-game menu. An optional auto-save mode stores a state when the game exits and offers to resume it the next time the same ROM is launched. State files are stored on the SD card under `/savestates/PCE/<CRC32>/`.
+- **USB drive mode** — The SD card can be shown on a PC over USB from the settings menu, so files can be copied without removing it from the console. See [USB drive mode](#usb-drive-mode).
 - **Backup RAM (BRAM)** — CD-ROM² games that use the System Card's BRAM (for in-game save data) have it persisted automatically alongside the save states.
 
 | | |
@@ -54,6 +55,17 @@ Each disc image (and its associated tracks for CUE/BIN) should be placed in its 
 3. Optionally include [metadata files](#using-metadata) for game information
 4. Insert the SD card into the device
 5. Use the menu to browse, select, and play games. Save data is automatically persisted to the SD card. The last 20 games that were started are kept in a [recently played list](#recently-played-games), one button press away in the menu.
+
+***
+
+## Known issues
+
+- **Ginga Fukei Densetsu Sapphire** stutters during gameplay: the picture updates at
+  roughly half rate in busy scenes. Emulation keeps full speed and audio is
+  unaffected. The board needs more time per frame than one frame allows, and the
+  emulated CPU accounts for the difference. Overclocking to 378 MHz improves matters
+  but does not remove it. No other CD game is known to be affected. See
+  [issue #17](https://github.com/PicoPlus-devel/pico-pcePlus/issues/17).
 
 ***
 
@@ -247,6 +259,46 @@ The list is kept in **`/recent_PCE.txt`** in the root of the SD card, as plain t
 If a game was moved, renamed or deleted on the SD card in the meantime, the list says so instead of starting it. Use SELECT to remove such an entry.
 
 On boards **without** PSRAM, one entry can be tagged **[READY]**. That is the game whose ROM is currently written to flash, which is the one that starts without waiting for the flashing step. As of v0.4 a ROM that is already in flash is not written again, so restarting that game is immediate.
+
+***
+
+## USB drive mode
+
+The SD card can be shown on a PC as a USB drive, so ROMs, save data and metadata
+can be copied without taking the card out of the console.
+
+Open the settings menu **from the rom browser** and choose **USB drive mode**. The
+entry is deliberately absent while a game is running, because the card is handed
+over to the computer and the emulator cannot use it at the same time.
+
+Connect the console to the computer with a USB cable. The card appears as a
+removable drive. When finished, eject it on the computer, or press Button2 on the
+console.
+
+### Which port the cable goes in
+
+On some boards a USB game controller uses the very port that USB drive mode needs
+for the cable to your computer: the Pimoroni Pico DV Demo Base, the Adafruit
+DVI/microSD breakouts and the PicoNES PCB, the Waveshare RP2350-Zero PCB and the
+Murmulator M2. Only one of the two can be plugged in at a time, so on those boards
+the menu has to be operated with a controller on a NES/SNES port or with a Wii
+Classic controller.
+
+Boards with a separate controller port — the Adafruit Metro RP2350 and Fruit Jam,
+the Waveshare RP2350-PiZero and RP2350-USB-A, and the Adafruit Feather RP2350 —
+are not affected: game controllers go into that port, while the built-in port is
+the one used for the cable to your computer.
+
+### The screen
+
+On boards that draw the screen directly (the PicoDVI configurations, such as the
+Waveshare RP2350 PiZero) the picture cannot be maintained while the card is
+shared, so the screen goes black until the drive is ejected, and the console
+restarts afterwards. A warning screen states this before anything is handed over
+and offers the chance to back out.
+
+On the HSTX configurations, such as the Adafruit Fruit Jam, the screen keeps
+working and no restart is needed.
 
 ***
 

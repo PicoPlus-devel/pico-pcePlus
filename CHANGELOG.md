@@ -1,6 +1,6 @@
 # CHANGELOG
 
-Maintenance release: updates the shared menu and support code. Fixes a black screen on DVI-only monitors and makes start-up steadier. The emulator itself is unchanged.
+Adds USB drive mode, which shows the SD card on a PC over USB so files can be copied without taking the card out. Also fixes save states for CD-ROM² and SuperGrafx games: a CD save state can now be reloaded after leaving a game and starting it again.
 
 # General Info
 
@@ -10,6 +10,49 @@ Maintenance release: updates the shared menu and support code. Fixes a black scr
 
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
+
+# v0.6
+
+Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and existing save states on the SD card are untouched.
+
+## New
+
+- **USB drive mode.** The SD card can be shown on a PC over USB, so ROMs and save
+  data can be copied without taking the card out of the console. It is started
+  from the **USB drive mode** entry in the settings menu, which appears only when
+  that menu is opened from the rom browser, not during a game. Eject the drive on
+  the computer when finished, or press Button2 on the console.
+  - On some boards a USB game controller uses the very port the cable to your
+    computer needs, so only one of the two can be plugged in at a time. On
+    those the menu is operated with a controller on a NES/SNES port or a Wii
+    Classic controller. Boards with a separate controller port are unaffected.
+  - On boards that draw the screen directly (PicoDVI configurations such as the
+    Waveshare RP2350 PiZero) the picture cannot be kept alive at the same time,
+    so the screen goes black until you are done and the console restarts
+    afterwards. A warning screen explains this before anything happens.
+  - See [USB drive mode](https://github.com/PicoPlus-devel/pico-pcePlus#usb-drive-mode).
+
+## Fixes
+
+- **Save states for CD games can be reloaded after restarting a game.** Previously
+  a CD save state could only be restored within the same session; after leaving the
+  game and starting it again it produced corrupted graphics. State files for CD
+  games are about 400 KB larger as a result. Existing save states still load.
+- **Save states for SuperGrafx games** now include the second video chip's memory,
+  which was previously left out.
+- **Steadier PSRAM start-up.** A step in the memory initialisation could finish
+  early and leave the interface out of step, which made start-up unreliable on
+  some boards.
+- **Overclocking is held to a slightly higher minimum voltage,** which reduces the
+  chance of small screen artefacts in the menu.
+
+## Known issues
+
+- **Ginga Fukei Densetsu Sapphire stutters during gameplay.** The picture updates at
+  roughly half rate in busy scenes. The cause is understood — the emulator needs
+  more time per frame than one frame allows — but there is no fix at present. Other
+  CD games are unaffected. See
+  [issue #17](https://github.com/PicoPlus-devel/pico-pcePlus/issues/17).
 
 # v0.5
 
