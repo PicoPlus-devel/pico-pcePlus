@@ -953,7 +953,7 @@ int main()
     ErrorMessage[0] = selectedRom[0] = 0;
 
     int fileSize = 0;
-    vreg_voltage voltage = VREG_VOLTAGE_1_20;
+    vreg_voltage voltage = VREG_VOLTAGE_1_30;
 #if SGX
     Frens::FlashParams *flashParams;
     // assign flashParams to point to flash location
