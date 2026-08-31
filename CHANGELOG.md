@@ -1,15 +1,58 @@
 # CHANGELOG
 
-Maintenance release: updates the shared menu and support code. Fixes a black screen on DVI-only monitors and makes start-up steadier. The emulator itself is unchanged.
+Adds USB drive mode, which shows the SD card on a PC over USB so files can be copied without taking the card out. Also fixes save states for CD-ROM² and SuperGrafx games: a CD save state can now be reloaded after leaving a game and starting it again.
 
 # General Info
 
 [Binaries for each configuration and PCB design are at the end of this page](#downloads___).
 
-[See the hardware section in the readme for how to install and wire up](https://github.com/fhoedemakers/pico-pcePlus#hardware-requirements)
+[See the hardware section in the readme for how to install and wire up](https://github.com/PicoPlus-devel/pico-pcePlus#hardware-requirements)
 
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
+
+# v0.6
+
+Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and existing save states on the SD card are untouched.
+
+## New
+
+- **USB drive mode.** The SD card can be shown on a PC over USB, so ROMs and save
+  data can be copied without taking the card out of the console. It is started
+  from the **USB drive mode** entry in the settings menu, which appears only when
+  that menu is opened from the rom browser, not during a game. Eject the drive on
+  the computer when finished, or press Button2 on the console.
+  - On some boards a USB game controller uses the very port the cable to your
+    computer needs, so only one of the two can be plugged in at a time. On
+    those the menu is operated with a controller on a NES/SNES port or a Wii
+    Classic controller. Boards with a separate controller port are unaffected.
+  - On boards that draw the screen directly (PicoDVI configurations such as the
+    Waveshare RP2350 PiZero) the picture cannot be kept alive at the same time,
+    so the screen goes black until you are done and the console restarts
+    afterwards. A warning screen explains this before anything happens.
+  - See [USB drive mode](https://github.com/PicoPlus-devel/pico-pcePlus#usb-drive-mode).
+
+## Fixes
+
+- **Save states for CD games can be reloaded after restarting a game.** Previously
+  a CD save state could only be restored within the same session; after leaving the
+  game and starting it again it produced corrupted graphics. State files for CD
+  games are about 400 KB larger as a result. Existing save states still load.
+- **Save states for SuperGrafx games** now include the second video chip's memory,
+  which was previously left out.
+- **Steadier PSRAM start-up.** A step in the memory initialisation could finish
+  early and leave the interface out of step, which made start-up unreliable on
+  some boards.
+- **Overclocking is held to a slightly higher minimum voltage,** which reduces the
+  chance of small screen artefacts in the menu.
+
+## Known issues
+
+- **Ginga Fukei Densetsu Sapphire stutters during gameplay.** The picture updates at
+  roughly half rate in busy scenes. The cause is understood — the emulator needs
+  more time per frame than one frame allows — but there is no fix at present. Other
+  CD games are unaffected. See
+  [issue #17](https://github.com/PicoPlus-devel/pico-pcePlus/issues/17).
 
 # v0.5
 
@@ -28,10 +71,10 @@ A maintenance release. It brings the shared menu and support code up to date; th
 	- Button2 starts the selected game, SELECT removes it from the list, START shows its artwork, Button1 closes the list.
 	- HuCard, SuperGrafx and CD games are all listed.
 	- The list is plain text in `/recent_PCE.txt` in the root of the SD card. A game that is no longer present is reported as missing when it is started. An unreadable list is treated as empty; no other settings are affected.
-	- See [Recently played games](https://github.com/fhoedemakers/pico-pcePlus#recently-played-games).
+	- See [Recently played games](https://github.com/PicoPlus-devel/pico-pcePlus#recently-played-games).
 - **Roms already present in flash are no longer re-flashed** (boards without PSRAM), so restarting the last played game no longer waits for the flashing step. The image is verified before the write is skipped. That game is marked `[READY]` in the recently played list.
 - **SNES controllers on the GPIO controller port**: all 12 buttons are read. In the menu A chooses, B goes back and X opens the recently played list. Previously a SNES pad was read as a NES pad and these buttons were mapped incorrectly. NES pads are unaffected.
-- **PicoNES PCB design v2.6** replaces v2.1 in the release assets: through-holes for mounting a Pico 2, Pico 2 W or Pimoroni Pico Plus 2 on male headers, and corrected D3/D4 silkscreen labels on controller port 2. No firmware change is required for either revision. See [Custom PCBs](https://github.com/fhoedemakers/pico-pcePlus#custom-pcbs).
+- **PicoNES PCB design v2.6** replaces v2.1 in the release assets: through-holes for mounting a Pico 2, Pico 2 W or Pimoroni Pico Plus 2 on male headers, and corrected D3/D4 silkscreen labels on controller port 2. No firmware change is required for either revision. See [Custom PCBs](https://github.com/PicoPlus-devel/pico-pcePlus#custom-pcbs).
 
 ## Fixes
 
@@ -58,14 +101,14 @@ A maintenance release. It brings the shared menu and support code up to date; th
 
 - Davis Cup Tennis no longer goes to a black screen after the match starts.
 - Battle Royale no longer crashes shortly after startup.
-- Cadash: in-game dialog boxes now render correctly. Some flicker on the dialog screen remains; see [#9](https://github.com/fhoedemakers/pico-pcePlus/issues/9).
+- Cadash: in-game dialog boxes now render correctly. Some flicker on the dialog screen remains; see [#9](https://github.com/PicoPlus-devel/pico-pcePlus/issues/9).
 - SuperGrafx graphics fixes in:
 	- Ghouls 'n Ghosts
 	- Aldynes
 	- Darius Plus
 	- Madou King Granzort
 - Fixed screen tearing in CHD-based CD games.
-- Reduced audio crackle in CD games on some board configurations. See [#11](https://github.com/fhoedemakers/pico-pcePlus/issues/11).
+- Reduced audio crackle in CD games on some board configurations. See [#11](https://github.com/PicoPlus-devel/pico-pcePlus/issues/11).
 - Game speed now matches the real PC Engine refresh rate (59.826 Hz). Previously the emulator ran slightly too fast, which made some titles play noticeably quicker than on original hardware.
 - The FPS overlay now reports a one-second running average instead of a noisy per-frame value.
 
@@ -154,32 +197,32 @@ The PSG rewrite, ADPCM decoder port, CHD integration, SuperGrafx work, and gener
 
 Binaries for each configuration are listed below. Only RP2350-based boards are supported; no RP2040 / Pico 1 binaries are provided.
 
-For board-by-board wiring, supported display modes, and which UF2 file to flash, refer to the [pico-infonesPlus documentation](https://github.com/fhoedemakers/pico-infonesPlus#setup). The set of supported boards and their pinouts is identical between the two projects.
+For board-by-board wiring, supported display modes, and which UF2 file to flash, refer to the [pico-infonesPlus documentation](https://github.com/PicoPlus-devel/pico-infonesPlus#setup). The set of supported boards and their pinouts is identical between the two projects.
 
 ### Standalone boards
 
 | Board | Binary |
 |:--|:--|
-| Adafruit Metro RP2350 | [picopcePlus_AdafruitMetroRP2350_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitMetroRP2350_arm.uf2) |
-| Adafruit Fruit Jam | [picopcePlus_AdafruitFruitJam_arm_piousb.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitFruitJam_arm_piousb.uf2) |
-| Adafruit Feather RP2350 with TLV320DAC3100 | [picopcePlus_AdafruitFeatherRP2350_TLV320DAC3100_arm_piousb.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitFeatherRP2350_TLV320DAC3100_arm_piousb.uf2) |
-| Waveshare RP2350-PiZero | [picopcePlus_WaveShareRP2350PiZero_arm_piousb.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_WaveShareRP2350PiZero_arm_piousb.uf2) |
+| Adafruit Metro RP2350 | [picopcePlus_AdafruitMetroRP2350_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitMetroRP2350_arm.uf2) |
+| Adafruit Fruit Jam | [picopcePlus_AdafruitFruitJam_arm_piousb.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitFruitJam_arm_piousb.uf2) |
+| Adafruit Feather RP2350 with TLV320DAC3100 | [picopcePlus_AdafruitFeatherRP2350_TLV320DAC3100_arm_piousb.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitFeatherRP2350_TLV320DAC3100_arm_piousb.uf2) |
+| Waveshare RP2350-PiZero | [picopcePlus_WaveShareRP2350PiZero_arm_piousb.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_WaveShareRP2350PiZero_arm_piousb.uf2) |
 
 ### Breadboard
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
-| Pimoroni Pico Plus 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
+| Pico 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
+| Pimoroni Pico Plus 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
 
 ### PicoNES PCB (PCB required)
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 / Pico 2 W | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
-| Pimoroni Pico Plus 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
+| Pico 2 / Pico 2 W | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
+| Pimoroni Pico Plus 2 | [picopcePlus_AdafruitDVISD_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_AdafruitDVISD_pico2_arm.uf2) |
 
-PCB: [pico_nesPCB_v2.6.zip](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/pico_nesPCB_v2.6.zip) (new in this release, replaces v2.1). [Readme](https://github.com/fhoedemakers/pico-pcePlus#picones-pcb)
+PCB: [pico_nesPCB_v2.6.zip](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/pico_nesPCB_v2.6.zip) (new in this release, replaces v2.1). [Readme](https://github.com/PicoPlus-devel/pico-pcePlus#picones-pcb)
 
 3D-printed case: [thingiverse.com/thing:6689537](https://www.thingiverse.com/thing:6689537). When the board is fitted on male headers, use the latest top cover; the older covers assume a Pico soldered flat and leave no room for the USB cable.
 
@@ -187,17 +230,17 @@ PCB: [pico_nesPCB_v2.6.zip](https://github.com/fhoedemakers/pico-pcePlus/release
 
 | Board | Binary |
 |:--|:--|
-| Waveshare RP2350-Zero | [picopcePlus_WaveShareRP2350ZeroWithPCB_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_WaveShareRP2350ZeroWithPCB_arm.uf2) |
+| Waveshare RP2350-Zero | [picopcePlus_WaveShareRP2350ZeroWithPCB_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_WaveShareRP2350ZeroWithPCB_arm.uf2) |
 
-PCB: [Gerber_PicoNES_Mini_PCB_v2.0.zip](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/Gerber_PicoNES_Mini_PCB_v2.0.zip). [Readme](https://github.com/fhoedemakers/pico-pcePlus#picones-mini-pcb)
+PCB: [Gerber_PicoNES_Mini_PCB_v2.0.zip](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/Gerber_PicoNES_Mini_PCB_v2.0.zip). [Readme](https://github.com/PicoPlus-devel/pico-pcePlus#picones-mini-pcb)
 
 3D-printed case: [thingiverse.com/thing:7041536](https://www.thingiverse.com/thing:7041536)
 
 ### PicoNES Micro PCB, Waveshare RP2350-USBA (PCB required)
 
-[Binary](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_WaveShare2350USBA_arm_piousb.uf2)
+[Binary](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_WaveShare2350USBA_arm_piousb.uf2)
 
-PCB: [Gerber_PicoNES_Micro_v1.2.zip](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/Gerber_PicoNES_Micro_v1.2.zip). [Readme](https://github.com/fhoedemakers/pico-pcePlus#picones-micro-pcb)
+PCB: [Gerber_PicoNES_Micro_v1.2.zip](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/Gerber_PicoNES_Micro_v1.2.zip). [Readme](https://github.com/PicoPlus-devel/pico-pcePlus#picones-micro-pcb)
 
 [Build guide](https://www.instructables.com/PicoNES-RaspberryPi-Pico-Based-NES-Emulator/)
 
@@ -205,8 +248,8 @@ PCB: [Gerber_PicoNES_Micro_v1.2.zip](https://github.com/fhoedemakers/pico-pcePlu
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 / Pico 2 W | [picopcePlus_PimoroniDVI_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_PimoroniDVI_pico2_arm.uf2) |
-| Pimoroni Pico Plus 2 | [picopcePlus_PimoroniDVI_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_PimoroniDVI_pico2_arm.uf2) |
+| Pico 2 / Pico 2 W | [picopcePlus_PimoroniDVI_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_PimoroniDVI_pico2_arm.uf2) |
+| Pimoroni Pico Plus 2 | [picopcePlus_PimoroniDVI_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_PimoroniDVI_pico2_arm.uf2) |
 
 ### SpotPear HDMI
 
@@ -214,7 +257,7 @@ For more info about the SpotPear HDMI see https://spotpear.com/index/product/det
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 / Pico 2 W | [picopcePlus_SpotpearHDMI_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_SpotpearHDMI_pico2_arm.uf2) |
+| Pico 2 / Pico 2 W | [picopcePlus_SpotpearHDMI_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_SpotpearHDMI_pico2_arm.uf2) |
 
 ### Murmulator M1
 
@@ -222,7 +265,7 @@ For more info about the Murmulator see https://murmulator.ru/.
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 / Pico 2 W | [picopcePlus_MurmulatorM1_pico2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_MurmulatorM1_pico2_arm.uf2) |
+| Pico 2 / Pico 2 W | [picopcePlus_MurmulatorM1_pico2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_MurmulatorM1_pico2_arm.uf2) |
 
 ### Murmulator M2
 
@@ -230,10 +273,10 @@ For more info about the Murmulator see https://murmulator.ru/.
 
 | Board | Binary |
 |:--|:--|
-| Pico 2 / Pico 2 W | [picopcePlus_MurmulatorM2_arm.uf2](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/picopcePlus_MurmulatorM2_arm.uf2) |
+| Pico 2 / Pico 2 W | [picopcePlus_MurmulatorM2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_MurmulatorM2_arm.uf2) |
 
 ### Other downloads
 
-- Metadata: [PCEMetadata.zip](https://github.com/fhoedemakers/pico-pcePlus/releases/latest/download/PCEMetadata.zip)
+- Metadata: [PCEMetadata.zip](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/PCEMetadata.zip)
 
 Extract the zip file to the root folder of the SD card. Select a game in the menu and press START to show more information and box art. Works for most official released games. The screensaver shows floating random cover art.

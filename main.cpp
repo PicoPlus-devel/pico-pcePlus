@@ -89,42 +89,38 @@ static int current_screen_h = 240;
 static int current_x_offset = 32;
 static int current_y_offset = 0;
 
-// Settings visibility for PCE
+// Settings visibility for PCE. Designated initializers keep each value bound to
+// its enum tag, so inserting a new MOPT_* cannot silently shift this list.
 const int8_t g_settings_visibility_pce[MOPT_COUNT] = {
-    0,                               // Exit Game, or back to menu. Always visible when in-game.
-    0,                               // Reset Game
-    BOOTLOADER_BUILD,                // Return to emuLoader picker (only when built for the loader)
-    0,                               // Save / Restore State
-    1,                               // Screen Mode
-    0,                               // Scanlines toggle (superseded by Screen Mode)
-    HSTX,                            // Scanline Type (HSTX only)
-    1,                               // FPS Overlay
-    0,                               // Audio Enable
-    0,                               // Frame Skip
-    HSTX && ENABLEDVI,               // Display Mode (HDMI or DVI, only when HSTX is enabled, because non-HSTX builds always use HDMI)
-    (EXT_AUDIO_IS_ENABLED ),         // External Audio
-    1,                               // Font Color
-    1,                               // Font Back Color
-    ENABLE_VU_METER,                 // VU Meter
-    //(HW_CONFIG == 8),                // Fruit Jam Internal Speaker
-    (HW_CONFIG == 8),                // Fruit Jam Volume Control
-    0,                               // DMG Palette (NES emulator does not use GameBoy palettes)
-    0,                               // Border Mode (Super Gameboy style borders not applicable for NES)
-    0,                               // Rapid Fire on A
-    0,                               // Rapid Fire on B
-    0,                               // Auto Insert Disk A, enabled at runtime on RP2350
-    0,                               // Auto Swap FDS, enabled at runtime on RP2350
-    0,                               // FDS Disk Swap (toggled on after fdsParse succeeds)
-    HSTX,                               // Overclock (CPU high clock toggle)
-    0,                               // YM Audio, SMS only
-    1,                               // Enter bootsel mode
-    1,                               // Controller Test
-    // Recently played is rom-browser only and menu.cpp forces it visible on
-    // >= 0, so it already showed via the zero-fill this list left behind.
-    // Stated explicitly so the array length matches MOPT_COUNT again: the next
-    // option appended to the enum then lands on a slot that is missing here,
-    // rather than silently inheriting this one's value. Set to -1 to hide it.
-    1,                               // Recently played
+    [MOPT_EXIT_GAME]                = 0,                  // Exit Game, or back to menu. Always visible when in-game.
+    [MOPT_RESET_GAME]               = 0,                  // Reset Game
+    [MOPT_REBOOT_TO_LOADER]         = BOOTLOADER_BUILD,   // Return to emuLoader picker (only when built for the loader)
+    [MOPT_SAVE_RESTORE_STATE]       = 0,                  // Save / Restore State
+    [MOPT_SCREENMODE]               = 1,                  // Screen Mode
+    [MOPT_SCANLINES]                = 0,                  // Scanlines toggle (superseded by Screen Mode)
+    [MOPT_SCANLINE_TYPE]            = HSTX,               // Scanline Type (HSTX only)
+    [MOPT_FPS_OVERLAY]              = 1,                  // FPS Overlay
+    [MOPT_AUDIO_ENABLE]             = 0,                  // Audio Enable
+    [MOPT_FRAMESKIP]                = 0,                  // Frame Skip
+    [MOPT_DISPLAY_MODE]             = HSTX && ENABLEDVI,  // Display Mode (HDMI or DVI, only when HSTX is enabled, because non-HSTX builds always use HDMI)
+    [MOPT_EXTERNAL_AUDIO]           = EXT_AUDIO_IS_ENABLED, // External Audio
+    [MOPT_FONT_COLOR]               = 1,                  // Font Color
+    [MOPT_FONT_BACK_COLOR]          = 1,                  // Font Back Color
+    [MOPT_FRUITJAM_VUMETER]         = ENABLE_VU_METER,    // VU Meter
+    [MOPT_FRUITJAM_VOLUME_CONTROL]  = (HW_CONFIG == 8),   // Fruit Jam Volume Control
+    [MOPT_DMG_PALETTE]              = 0,                  // DMG Palette (not applicable for PCE)
+    [MOPT_BORDER_MODE]              = 0,                  // Border Mode (Super Gameboy style borders not applicable for PCE)
+    [MOPT_RAPID_FIRE_ON_A]          = 0,                  // Rapid Fire on A
+    [MOPT_RAPID_FIRE_ON_B]          = 0,                  // Rapid Fire on B
+    [MOPT_AUTO_INSERT_FDS_DISK_A]   = 0,                  // Auto Insert Disk A, enabled at runtime on RP2350
+    [MOPT_AUTO_SWAP_FDS_DISK]       = 0,                  // Auto Swap FDS, enabled at runtime on RP2350
+    [MOPT_FDS_DISK_SWAP]            = 0,                  // FDS Disk Swap (toggled on after fdsParse succeeds)
+    [MOPT_OVERCLOCK]                = HSTX,               // Overclock (CPU high clock toggle)
+    [MOPT_FM_AUDIO]                 = 0,                  // YM Audio, SMS only
+    [MOPT_ENTER_BOOTSEL_MODE]       = 1,                  // Enter bootsel mode
+    [MOPT_CONTROLLER_TEST]          = 1,                  // Controller Test
+    [MOPT_RECENT_GAMES]             = 0,                  // Recently played (menu.cpp force-shows this in the rom browser)
+    [MOPT_USB_DRIVE_MODE]           = 0,                  // USB drive mode (menu.cpp force-shows this in the rom browser)
 };
 
 const uint8_t g_available_screen_modes_pce[] = {
@@ -957,7 +953,7 @@ int main()
     ErrorMessage[0] = selectedRom[0] = 0;
 
     int fileSize = 0;
-    vreg_voltage voltage = VREG_VOLTAGE_1_20;
+    vreg_voltage voltage = VREG_VOLTAGE_1_30;
 #if SGX
     Frens::FlashParams *flashParams;
     // assign flashParams to point to flash location

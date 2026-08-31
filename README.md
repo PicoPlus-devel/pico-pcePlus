@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**pico-pcePlus** is a PC Engine / TurboGrafx-16 emulator for RP2350-based microcontrollers. It is built on the [pce-go](https://github.com/ducalex/retro-go) emulation core from retro-go by ducalex, integrated with the video, audio, menu, and SD card framework from [pico-infonesPlus](https://github.com/fhoedemakers/pico-infonesPlus).
+**pico-pcePlus** is a PC Engine / TurboGrafx-16 emulator for RP2350-based microcontrollers. It is built on the [pce-go](https://github.com/ducalex/retro-go) emulation core from retro-go by ducalex, integrated with the video, audio, menu, and SD card framework from [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus).
 
 
 > [!IMPORTANT]
@@ -10,10 +10,10 @@
 
 This project is part of a family of Raspberry Pi Pico emulator projects:
 
-- NES: [pico-infonesPlus](https://github.com/fhoedemakers/pico-infonesPlus)
-- Sega Master System / Game Gear: [pico-smsplus](https://github.com/fhoedemakers/pico-smsplus)
-- Game Boy / Game Boy Color: [pico-peanutGB](https://github.com/fhoedemakers/pico-peanutGB)
-- Sega Mega Drive / Genesis: [pico-genesisPlus](https://github.com/fhoedemakers/pico-genesisPlus)
+- NES: [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus)
+- Sega Master System / Game Gear: [pico-smsplus](https://github.com/PicoPlus-devel/pico-smsplus)
+- Game Boy / Game Boy Color: [pico-peanutGB](https://github.com/PicoPlus-devel/pico-peanutGB)
+- Sega Mega Drive / Genesis: [pico-genesisPlus](https://github.com/PicoPlus-devel/pico-genesisPlus)
 
 ***
 
@@ -24,6 +24,7 @@ This project is part of a family of Raspberry Pi Pico emulator projects:
 - **CD-ROM²** — CD-ROM² and Super CD-ROM² games are supported, including CD-DA audio playback and ADPCM streaming. CD-ROM² playback requires PSRAM and a System Card BIOS supplied by the user.
 - **Audio CDs** — Regular music CDs can be played with the CD player built into the System Card BIOS. Put a CUE/BIN or CHD image of a music CD on the SD card and start it like a CD game: the track list appears and playback, track skip, pause and the level meters all work.
 - **Save states** — Manual save and load slots are available through the in-game menu. An optional auto-save mode stores a state when the game exits and offers to resume it the next time the same ROM is launched. State files are stored on the SD card under `/savestates/PCE/<CRC32>/`.
+- **USB drive mode** — The SD card can be shown on a PC over USB from the settings menu, so files can be copied without removing it from the console. See [USB drive mode](#usb-drive-mode).
 - **Backup RAM (BRAM)** — CD-ROM² games that use the System Card's BRAM (for in-game save data) have it persisted automatically alongside the save states.
 
 | | |
@@ -57,6 +58,17 @@ Each disc image (and its associated tracks for CUE/BIN) should be placed in its 
 
 ***
 
+## Known issues
+
+- **Ginga Fukei Densetsu Sapphire** stutters during gameplay: the picture updates at
+  roughly half rate in busy scenes. Emulation keeps full speed and audio is
+  unaffected. The board needs more time per frame than one frame allows, and the
+  emulated CPU accounts for the difference. Overclocking to 378 MHz improves matters
+  but does not remove it. No other CD game is known to be affected. See
+  [issue #17](https://github.com/PicoPlus-devel/pico-pcePlus/issues/17).
+
+***
+
 ## Hardware requirements
 
 The emulator runs on RP2350-based boards in two configurations:
@@ -64,7 +76,7 @@ The emulator runs on RP2350-based boards in two configurations:
 - **RP2350 without PSRAM** — Supports HuCard ROMs, save states, and metadata display.
 - **RP2350 with PSRAM** — In addition to the above, enables SuperGrafx titles, CD-ROM² playback (CUE/BIN or CHD), Backup RAM persistence, and audio recording.
 
-For board-by-board wiring, supported display modes, and which UF2 file to flash, refer to the [pico-infonesPlus documentation](https://github.com/fhoedemakers/pico-infonesPlus#setup). The set of supported boards and their pinouts is identical between the two projects.
+For board-by-board wiring, supported display modes, and which UF2 file to flash, refer to the [pico-infonesPlus documentation](https://github.com/PicoPlus-devel/pico-infonesPlus#setup). The set of supported boards and their pinouts is identical between the two projects.
 
 A board and its breakouts can also be built into a finished little console on one of the three [custom PCBs](#custom-pcbs).
 
@@ -80,9 +92,9 @@ Three community PCB designs turn a supported board and its breakouts into a fini
 | [PicoNES Mini](#picones-mini-pcb) | Waveshare RP2350-Zero | `-c6` | `Gerber_PicoNES_Mini_PCB_v2.0.zip` | Gavin Knight |
 | [PicoNES Micro](#picones-micro-pcb) | Waveshare RP2350-USB-A | `-c9` | `Gerber_PicoNES_Micro_v1.2.zip` | Gavin Knight |
 
-All three archives are attached to every [release](https://github.com/fhoedemakers/pico-pcePlus/releases/latest) of this project and also live in [pico_shared/PCB](https://github.com/fhoedemakers/pico_shared/tree/main/PCB). Upload the zip as-is to a PCB manufacturer of your choice; [PCBWay](https://www.pcbway.com/) and JLCPCB are both good options.
+All three archives are attached to every [release](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest) of this project and also live in [pico_shared/PCB](https://github.com/PicoPlus-devel/pico_shared/tree/main/PCB). Upload the zip as-is to a PCB manufacturer of your choice; [PCBWay](https://www.pcbway.com/) and JLCPCB are both good options.
 
-The designs come from [pico-infonesPlus](https://github.com/fhoedemakers/pico-infonesPlus) and kept their NES-flavoured names, but there is nothing NES-specific about them — they are DVI, microSD and controller wiring, and this emulator runs on them just as well. The PicoNES and PicoNES Mini both have two controller ports, so the second player of a two-player PC Engine game has a pad; the PicoNES Micro is a single-controller design.
+The designs come from [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus) and kept their NES-flavoured names, but there is nothing NES-specific about them — they are DVI, microSD and controller wiring, and this emulator runs on them just as well. The PicoNES and PicoNES Mini both have two controller ports, so the second player of a two-player PC Engine game has a pad; the PicoNES Micro is a single-controller design.
 
 > [!IMPORTANT]
 > The PicoNES also fits an original RP2040 Pico, and the PicoNES Mini exists in an RP2040-Zero flavour. Neither is of use here — this emulator requires an RP2350.
@@ -143,7 +155,7 @@ Gavin Knight ([DynaMight1124](https://github.com/DynaMight1124)) designed an NES
 
 <img width="480" alt="Top cover with a button for BOOTSEL" src="https://github.com/user-attachments/assets/3c8f8990-51b9-4873-9054-64bb2cd6c300" />
 
-For the full photo gallery and assembly detail, see the [PCB section of the pico-infonesPlus documentation](https://github.com/fhoedemakers/pico-infonesPlus#pcb-with-raspberry-pi-pico-or-pico-2-and-pimoroni-pico-plus-2).
+For the full photo gallery and assembly detail, see the [PCB section of the pico-infonesPlus documentation](https://github.com/PicoPlus-devel/pico-infonesPlus#pcb-with-raspberry-pi-pico-or-pico-2-and-pimoroni-pico-plus-2).
 
 ### PicoNES Mini PCB
 
@@ -201,7 +213,7 @@ The emulator identifies BIOS files by CRC32 and, when several are available, sel
 
 The emulator can display box art and a short text description for each ROM when a metadata pack is present on the SD card. With the pack installed, pressing **START** on a ROM in the file browser displays its metadata; the screensaver also shows random box art.
 
-A metadata pack can be downloaded from the [releases page](https://github.com/fhoedemakers/pico-pcePlus/releases) and extracted to the root of the SD card. It is installed under:
+A metadata pack can be downloaded from the [releases page](https://github.com/PicoPlus-devel/pico-pcePlus/releases) and extracted to the root of the SD card. It is installed under:
 
 ```
 /metadata/PCE/
@@ -242,11 +254,51 @@ In the list:
 
 Games are added automatically when they are started, so nothing has to be enabled. HuCard, SuperGrafx and CD games all appear in the list; starting a game that is already in it moves it back to the top. The list closes by itself after a minute without input.
 
-The list is kept in **`/recent_PCE.txt`** in the root of the SD card, as plain text with one game per line. It survives a reboot and can be read, edited or deleted on a PC. Deleting the file simply empties the list, and a damaged file is treated as an empty list — unlike the settings file, nothing else is reset. Each emulator running under [pico-bootLoader](https://github.com/fhoedemakers/pico-bootLoader) keeps its own list.
+The list is kept in **`/recent_PCE.txt`** in the root of the SD card, as plain text with one game per line. It survives a reboot and can be read, edited or deleted on a PC. Deleting the file simply empties the list, and a damaged file is treated as an empty list — unlike the settings file, nothing else is reset. Each emulator running under [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader) keeps its own list.
 
 If a game was moved, renamed or deleted on the SD card in the meantime, the list says so instead of starting it. Use SELECT to remove such an entry.
 
 On boards **without** PSRAM, one entry can be tagged **[READY]**. That is the game whose ROM is currently written to flash, which is the one that starts without waiting for the flashing step. As of v0.4 a ROM that is already in flash is not written again, so restarting that game is immediate.
+
+***
+
+## USB drive mode
+
+The SD card can be shown on a PC as a USB drive, so ROMs, save data and metadata
+can be copied without taking the card out of the console.
+
+Open the settings menu **from the rom browser** and choose **USB drive mode**. The
+entry is deliberately absent while a game is running, because the card is handed
+over to the computer and the emulator cannot use it at the same time.
+
+Connect the console to the computer with a USB cable. The card appears as a
+removable drive. When finished, eject it on the computer, or press Button2 on the
+console.
+
+### Which port the cable goes in
+
+On some boards a USB game controller uses the very port that USB drive mode needs
+for the cable to your computer: the Pimoroni Pico DV Demo Base, the Adafruit
+DVI/microSD breakouts and the PicoNES PCB, the Waveshare RP2350-Zero PCB and the
+Murmulator M2. Only one of the two can be plugged in at a time, so on those boards
+the menu has to be operated with a controller on a NES/SNES port or with a Wii
+Classic controller.
+
+Boards with a separate controller port — the Adafruit Metro RP2350 and Fruit Jam,
+the Waveshare RP2350-PiZero and RP2350-USB-A, and the Adafruit Feather RP2350 —
+are not affected: game controllers go into that port, while the built-in port is
+the one used for the cable to your computer.
+
+### The screen
+
+On boards that draw the screen directly (the PicoDVI configurations, such as the
+Waveshare RP2350 PiZero) the picture cannot be maintained while the card is
+shared, so the screen goes black until the drive is ejected, and the console
+restarts afterwards. A warning screen states this before anything is handed over
+and offers the chance to back out.
+
+On the HSTX configurations, such as the Adafruit Fruit Jam, the screen keeps
+working and no restart is needed.
 
 ***
 
@@ -262,11 +314,11 @@ On boards **without** PSRAM, one entry can be tagged **[READY]**. That is the ga
 ### Clone and build
 
 ```bash
-git clone --recurse-submodules https://github.com/fhoedemakers/pico-pcePlus.git
+git clone --recurse-submodules https://github.com/PicoPlus-devel/pico-pcePlus.git
 cd pico-pcePlus
 ```
 
-Run `./bld.sh -h` to see the available build options for a single configuration, or `./buildAll.sh` to build every supported configuration and collect the resulting UF2 files in the `releases` folder. For the mapping between configuration numbers and specific boards, consult the [pico-infonesPlus](https://github.com/fhoedemakers/pico-infonesPlus) documentation.
+Run `./bld.sh -h` to see the available build options for a single configuration, or `./buildAll.sh` to build every supported configuration and collect the resulting UF2 files in the `releases` folder. For the mapping between configuration numbers and specific boards, consult the [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus) documentation.
 
 ***
 
@@ -290,7 +342,7 @@ This project is licensed under the GNU General Public License v3.0. See the [LIC
 ### Emulation cores and frameworks
 
 - [pce-go](https://github.com/ducalex/retro-go) — PC Engine / TurboGrafx-16 emulation core, by ducalex (part of retro-go).
-- [pico-infonesPlus](https://github.com/fhoedemakers/pico-infonesPlus) — shared video, audio, menu, and SD card infrastructure, by Frank Hoedemakers.
+- [pico-infonesPlus](https://github.com/PicoPlus-devel/pico-infonesPlus) — shared video, audio, menu, and SD card infrastructure, by Frank Hoedemakers.
 - [Mesen2](https://github.com/SourMesen/Mesen2) — used as a reference for the PC Engine CD ADPCM decoder port.
 
 ### Video and display

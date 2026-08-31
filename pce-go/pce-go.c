@@ -70,6 +70,72 @@ save_var_t SaveStateVars[] =
 	SVAR_END
 };
 
+// CD RAM sizes — declared here (rather than beside LoadDisc) because
+// CdSaveStateVars below needs them.
+#define CD_RAM_SIZE      0x10000   // 64KB
+#define SCD_RAM_SIZE     0x30000   // 192KB
+#define ADPCM_RAM_SIZE   0x10000   // 64KB
+
+// CD games execute from cd_ram / scd_ram and stream samples through adpcm_ram,
+// none of which were in any save-state list. A CD save state therefore restored
+// the CPU (including a PC pointing into scd_ram) without the code and data it
+// points at: reloading one in a fresh session would run whatever happened to be
+// in those buffers. It only ever appeared to work because reloading inside the
+// same session left the game's data in place.
+//
+// acd_ram (Arcade Card, 2 MB) is deliberately excluded — it would make every
+// save state 2 MB. Arcade Card titles remain unsupported for save states.
+save_var_t CdSaveStateVars[] =
+{
+	SVAR_P("CD.ram",    CD.cd_ram,    CD_RAM_SIZE),
+	SVAR_P("CD.scdram", CD.scd_ram,   SCD_RAM_SIZE),
+	SVAR_P("CD.adpcm",  CD.adpcm_ram, ADPCM_RAM_SIZE),
+
+	// The CDC/ADPCM/CD-DA machine state, not just the RAM. Restoring the RAM
+	// alone leaves the loaded game code paired with whatever CD registers the
+	// console happened to be in — a fresh power-on set on a clean boot, or a
+	// live mid-transfer set when quick-loading into a running game. Either is
+	// inconsistent with the save and shows up as corrupted graphics and missing
+	// sprites, because this game drives its display loop off $180C/$1803.
+	//
+	// Disc geometry (tracks, cue_dir, counts) is deliberately NOT saved — it is
+	// rebuilt by LoadDisc and must describe the disc actually inserted now.
+	SVAR_A("CD.scsicmd", CD.scsi_command),
+	SVAR_1("CD.cmdlen",  CD.scsi_cmd_len),   SVAR_1("CD.cmdidx",  CD.scsi_cmd_idx),
+	// 1 byte, NOT SVAR_4: cdc_phase_t is an enum, and ARM GCC uses
+	// -fshort-enums (1 byte) while x86 uses 4. Saving 4 bytes read past the
+	// field on device and, worse, loading 4 bytes wrote over the start of
+	// CD.sector_buf — corrupting CD data mid-transfer. Values are 0-6 and the
+	// low byte is correct on both little-endian targets.
+	SVAR_N("CD.phase",   CD.phase, 1),
+	SVAR_N("CD.secbuf",  CD.sector_buf, CD_SECTOR_SIZE),
+	SVAR_4("CD.dataidx", CD.data_index),     SVAR_4("CD.datalen", CD.data_length),
+	SVAR_4("CD.readlba", CD.read_lba),       SVAR_4("CD.readrem", CD.read_remaining),
+
+	SVAR_2("CD.apaddr",  CD.adpcm_addr_port), SVAR_2("CD.aprd",   CD.adpcm_read_addr),
+	SVAR_2("CD.apwr",    CD.adpcm_write_addr),SVAR_2("CD.aplen",  CD.adpcm_length),
+	SVAR_1("CD.aprdbuf", CD.adpcm_read_buf),  SVAR_1("CD.apctrl", CD.adpcm_ctrl),
+	SVAR_1("CD.apdma",   CD.adpcm_dma_ctrl),  SVAR_1("CD.apstat", CD.adpcm_status),
+	SVAR_1("CD.aprate",  CD.adpcm_rate),      SVAR_1("CD.apfade", CD.adpcm_fade),
+	SVAR_1("CD.applay",  CD.adpcm_playing),   SVAR_1("CD.apnib",  CD.adpcm_nibble),
+	SVAR_1("CD.apmag",   CD.adpcm_magnitude), SVAR_2("CD.apout",  CD.adpcm_cur_output),
+	SVAR_2("CD.appaddr", CD.adpcm_play_addr), SVAR_2("CD.applen", CD.adpcm_play_len),
+	SVAR_4("CD.apacc",   CD.adpcm_resample_acc),
+
+	SVAR_1("CD.sensek",  CD.sense_key),      SVAR_1("CD.senseasc", CD.sense_asc),
+	SVAR_1("CD.senseaq", CD.sense_ascq),
+
+	SVAR_1("CD.austat",  CD.audio_status),
+	SVAR_4("CD.austart", CD.audio_start_lba), SVAR_4("CD.auend",  CD.audio_end_lba),
+	SVAR_4("CD.aucur",   CD.audio_cur_lba),   SVAR_2("CD.ausamp", CD.audio_cur_sample),
+	SVAR_1("CD.aumode",  CD.audio_end_mode),
+
+	SVAR_1("CD.irqmask", CD.irq_mask),      SVAR_1("CD.irqstat", CD.irq_status),
+	SVAR_1("CD.bramlck", CD.bram_locked),
+
+	SVAR_END
+};
+
 // SuperGrafx state — written only when PCE.VPC.is_sgx, read by LoadState as a
 // fallback lookup. PCE saves don't carry these keys and load fine; SGX saves
 // carry both lists and so do SGX boots.
@@ -295,9 +361,6 @@ LoadFile(const char *name)
 
 
 // CD RAM sizes (bytes)
-#define CD_RAM_SIZE      0x10000   // 64KB
-#define SCD_RAM_SIZE     0x30000   // 192KB
-#define ADPCM_RAM_SIZE   0x10000   // 64KB
 #define ACD_RAM_SIZE     0x200000  // 2MB
 #define BRAM_PAGE_SIZE   0x2000    // 8KB page, lower 2KB is real BRAM
 
@@ -401,6 +464,7 @@ LoadDisc(const char *cue_path)
 		PCE.MemoryMapR[i] = PCE.ROM_DATA + i * 0x2000;
 		PCE.MemoryMapW[i] = PCE.NULLRAM;   // BIOS is read-only
 	}
+
 
 	// --- 3. Allocate CD/SCD/ADPCM/Arcade Card RAM + BRAM page ---
 	CD.cd_ram         = (uint8_t *)frens_f_malloc(CD_RAM_SIZE);
@@ -579,13 +643,13 @@ LoadState(const char *name)
 
 	// Search both the PCE and SGX var tables. PCE saves only carry PCE keys
 	// (SGX entries silently skipped); SGX saves carry both lists.
-	save_var_t *var_lists[] = { SaveStateVars, SgxSaveStateVars };
+	save_var_t *var_lists[] = { SaveStateVars, SgxSaveStateVars, CdSaveStateVars };
 
 	while (fread(&block, sizeof(block), 1, fp))
 	{
 		size_t block_end = ftell(fp) + block.len;
 
-		for (int list_idx = 0; list_idx < 2; list_idx++)
+		for (int list_idx = 0; list_idx < 3; list_idx++)
 		{
 			save_var_t *list = var_lists[list_idx];
 			bool matched = false;
@@ -648,10 +712,11 @@ SaveState(const char *name)
 
 	// PCE list is always written. SGX list is appended only when running SGX
 	// — keeps PCE/CD save files identical to before this change.
-	save_var_t *var_lists[] = { SaveStateVars, NULL };
+	save_var_t *var_lists[] = { SaveStateVars, NULL, NULL };
 	if (PCE.VPC.is_sgx) var_lists[1] = SgxSaveStateVars;
+	if (CD.cd_attached) var_lists[2] = CdSaveStateVars;
 
-	for (int list_idx = 0; list_idx < 2; list_idx++)
+	for (int list_idx = 0; list_idx < 3; list_idx++)
 	{
 		save_var_t *list = var_lists[list_idx];
 		if (!list) continue;

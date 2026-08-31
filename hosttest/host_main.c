@@ -173,6 +173,23 @@ int main(int argc, char **argv)
 	if (getenv("PCE_QUIRK_CLEAR"))
 		PCE.Quirks &= ~strtoul(getenv("PCE_QUIRK_CLEAR"), NULL, 0);
 
+	// PCE_LOAD_STATE=<file> — load a save state written by the device
+	// (state.cpp's Emulator_SaveState) before running. Same on-disk format, and
+	// LoadState() uses plain fopen() so the path is a normal filesystem path,
+	// not a PCE_SD_ROOT-relative FatFs one.
+	//
+	// Lets a device-written state be replayed on the host, which is how the
+	// CD save-state fixes were validated (device restore vs host restore from
+	// the same file).
+	if (getenv("PCE_LOAD_STATE")) {
+		const char *sp = getenv("PCE_LOAD_STATE");
+		if (LoadState(sp) != 0) {
+			fprintf(stderr, "LoadState(%s) FAILED\n", sp);
+			return 3;
+		}
+		printf("Loaded save state: %s\n", sp);
+	}
+
 	printf("Loaded %s (sgx=%d, cd=%d, quirks=0x%x). Running %d frames.\n",
 		rom_path, is_sgx, is_cd, (unsigned)PCE.Quirks, total_frames);
 

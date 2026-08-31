@@ -214,10 +214,16 @@ void cd_close(void);
 
 // CD Audio (called from main loop each frame)
 void cd_audio_update(void);
+
+// Serialise core0 FatFS access against core1's CD-DA prefetch. No-ops when no
+// disc is mounted. Must be paired.
+void cd_sd_lock(void);
+void cd_sd_unlock(void);
 int  cd_audio_generate_samples(int16_t *out, int num_samples);
 
 // Diagnostics: cumulative CD-DA ring underrun count (see CD_AUDIO_DIAG)
 extern volatile uint32_t cd_audio_underruns;
+
 
 // Diagnostics: fetch+clear the per-frame data-sector read tally. Returns
 // non-zero values only when CD_DEBUG_READ was set at compile time. out_first_lba

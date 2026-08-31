@@ -102,6 +102,24 @@ static void scsi_dump_state_once(void)
 static mutex_t sd_mutex;
 static bool sd_mutex_inited = false;
 
+// Exposed so anything else on core0 that touches FatFS while a disc is mounted
+// can serialise against core1's CD-DA prefetch. FatFS is NOT reentrant: save
+// states (state.cpp) were doing f_open/f_read/f_write of ~400 KB on core0 while
+// core1 ran f_read on the audio track, which corrupted the transfer — the
+// symptom was a state that reloaded with correct background tiles (low VRAM)
+// but garbage sprites (high VRAM), i.e. a partially-clobbered read.
+void cd_sd_lock(void)
+{
+	if (sd_mutex_inited)
+		mutex_enter_blocking(&sd_mutex);
+}
+
+void cd_sd_unlock(void)
+{
+	if (sd_mutex_inited)
+		mutex_exit(&sd_mutex);
+}
+
 // SCSI bus signal state
 static bool scsi_req = false;
 static bool scsi_ack = false;
