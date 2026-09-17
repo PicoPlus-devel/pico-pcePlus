@@ -230,9 +230,9 @@ The emulator presents the PC Engine controller mapping on any connected USB cont
 
 The PC Engine controller has a D-pad, two action buttons (**I** and **II**), and two system buttons (**SELECT** and **RUN**).
 
-During gameplay, **SELECT + RUN** opens the in-game settings menu. All other in-game adjustments — screen mode, scanlines, FPS overlay, VU meter, external (I²S) audio output, volume, save and restore state, rapid-fire, audio recording, and so on — are reached from this menu.
+During gameplay, **SELECT + RUN** opens the in-game settings menu, from which the game can be quit or reset, save states managed, and settings such as screen mode, framerate overlay and audio output changed. See [Settings menu](#settings-menu) for the full list.
 
-In the file browser, Button2 opens a folder or starts a game, Button1 goes back to the parent folder, START shows metadata and box art, SELECT opens the settings menu, and Button3 opens the [recently played list](#recently-played-games). Button3 is X on a SNES or Wii Classic pad, Y on XInput, Triangle on PlayStation and C on Genesis; a plain NES controller has no Button3.
+In the file browser, Button2 opens a folder or starts a game, Button1 goes back to the parent folder, START shows metadata and box art, SELECT opens the [settings menu](#settings-menu), and Button3 opens the [recently played list](#recently-played-games). Button3 is X on a SNES or Wii Classic pad, Y on XInput, Triangle on PlayStation and C on Genesis; a plain NES controller has no Button3.
 
 Two-player games are supported. Without a USB controller, the two GPIO controller ports are player 1 and player 2. With a USB controller connected, that pad becomes player 1 and either GPIO port (or a Wii Classic Controller) drives player 2.
 
@@ -240,7 +240,7 @@ Two-player games are supported. Without a USB controller, the two GPIO controlle
 
 ## Recently played games
 
-The menu keeps a list of the **last 20 games that were started**, most recent first. Open it with **Button3** in the file browser, or with the **Recently played** entry at the top of the settings menu. That entry is only present when the settings menu is opened from the file browser, not from inside a running game — which is also the route for pads without a Button3.
+The menu keeps a list of the **last 20 games that were started**, most recent first. Open it with **Button3** in the file browser, or with the **Recently played** entry at the top of the [settings menu](#settings-menu). That entry is only present when the settings menu is opened from the file browser, not from inside a running game — which is also the route for pads without a Button3.
 
 In the list:
 
@@ -262,43 +262,64 @@ On boards **without** PSRAM, one entry can be tagged **[READY]**. That is the ga
 
 ***
 
+## Settings menu
+
+The settings menu is opened with SELECT from the file browser, or with SELECT + RUN while a game is
+running. Not every entry is available on every board or in every situation. The entries are listed in
+the order they appear on screen.
+
+| Setting | Description |
+| ------- | ----------- |
+| Recently played | Open the list of the [last 20 games that were started](#recently-played-games) and start one of them. File browser only, not available in-game. |
+| Quit game | Leave the game and return to the file browser. For CD-ROM² games the Backup RAM (BRAM) is written to the SD card here, and when auto save is enabled a save state is stored as well. In-game only. |
+| Reset game | Reset the running game. In-game only. |
+| Return to emulator selection | Go back to the emulator picker. Only present in [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader) builds. |
+| Save/Load State | Save or load the game state in one of five slots or the quick save slot, and switch automatic saving on exit and loading on start on or off. In-game only. |
+| Screen Mode | Cycle the screen modes: 1:1 or 8:7 pixel aspect ratio, each with or without scanlines. On HSTX boards, games that use a resolution wider than 256 pixels are always shown 1:1. |
+| Scanline Type | Simple or LCD style scanlines. HSTX boards only. |
+| Framerate Overlay | Show the frames per second on screen. On HSTX boards the number of video resyncs is shown next to it. |
+| Display Mode | HDMI or DVI output. HSTX boards only. |
+| External Audio | Route audio to the I²S/line-out output instead of HDMI. Only on boards with such an output. Selecting DVI as Display Mode enables this automatically, because DVI carries no audio. |
+| Menu Font Color / Menu Font Back Color | Menu colours (0-63). |
+| Fruit Jam VU Meter | Let the NeoPixel LEDs follow the audio level. Fruit Jam only. |
+| Fruit Jam Volume Control | Volume of the built-in speaker and the audio jack (-63 to +23 dB). Fruit Jam only. |
+| Overclock | Raise the CPU clock from 252 MHz to 378 MHz. The board reboots to apply the change. Required for SuperGrafx games to run at full speed with audio. HSTX boards only. File browser only, not available in-game. |
+| Controller Test | Show a gamepad graphic that follows the controller a button was last pressed on, plus a list of connected input sources. Useful for checking wiring and button mappings. Hold SELECT + START for 2 seconds to exit. |
+| Enter BOOTSEL Mode | Reboot into BOOTSEL so new firmware can be flashed. |
+| USB Drive Mode | Show the SD card on a computer as a USB drive, so games can be added or removed without taking the card out. See [USB drive mode](#usb-drive-mode). File browser only, not available in-game. |
+
+> [!NOTE]
+> Changes are only applied when **SAVE** is selected. **CANCEL** discards them, **DEFAULT** restores the default values.
+
+***
+
 ## USB drive mode
 
-The SD card can be shown on a PC as a USB drive, so ROMs, save data and metadata
-can be copied without taking the card out of the console.
+USB drive mode presents the SD card to a computer as a USB mass storage device, so games can be added or
+removed without taking the card out of the console. Connect the console to the computer, open the
+[settings menu](#settings-menu) with SELECT from the game list and choose **USB Drive Mode**. The card
+appears on the computer as a removable drive.
 
-Open the settings menu **from the rom browser** and choose **USB drive mode**. The
-entry is deliberately absent while a game is running, because the card is handed
-over to the computer and the emulator cannot use it at the same time.
+The entry is only offered when the settings menu is opened from the game list. It is not available while
+a game is running: the running game holds its save files open and its ROM is mapped out of flash, and
+letting the computer rewrite the card underneath that would corrupt both.
 
-Connect the console to the computer with a USB cable. The card appears as a
-removable drive. When finished, eject it on the computer, or press Button2 on the
-console.
+When you are finished, eject the drive on the computer. The console notices this and leaves USB drive
+mode by itself. Pressing B on the console leaves as well, for when no computer is attached. The game
+list is re-read on the way out, so files added from the computer appear without having to restart.
 
-### Which port the cable goes in
+> [!NOTE]
+> Transfers are slow. The console is a USB full-speed device and reaches the card a sector at a time
+> over SPI, so copying is far slower than reading the card in a card reader. USB drive mode is meant
+> for adding or replacing a few games. For filling a card, or for copying a large amount of data, take
+> the card out and use a card reader.
 
-On some boards a USB game controller uses the very port that USB drive mode needs
-for the cable to your computer: the Pimoroni Pico DV Demo Base, the Adafruit
-DVI/microSD breakouts and the PicoNES PCB, the Waveshare RP2350-Zero PCB and the
-Murmulator M2. Only one of the two can be plugged in at a time, so on those boards
-the menu has to be operated with a controller on a NES/SNES port or with a Wii
-Classic controller.
+Behaviour depends on where controllers are connected on your board.
 
-Boards with a separate controller port — the Adafruit Metro RP2350 and Fruit Jam,
-the Waveshare RP2350-PiZero and RP2350-USB-A, and the Adafruit Feather RP2350 —
-are not affected: game controllers go into that port, while the built-in port is
-the one used for the cable to your computer.
-
-### The screen
-
-On boards that draw the screen directly (the PicoDVI configurations, such as the
-Waveshare RP2350 PiZero) the picture cannot be maintained while the card is
-shared, so the screen goes black until the drive is ejected, and the console
-restarts afterwards. A warning screen states this before anything is handed over
-and offers the chance to back out.
-
-On the HSTX configurations, such as the Adafruit Fruit Jam, the screen keeps
-working and no restart is needed.
+| Board | Behaviour |
+| ----- | --------- |
+| Controllers on a separate USB port (boards built with PIO USB, such as the Fruit Jam) | The console's own USB port is free, so controllers keep working and the screen stays on. The menu returns to the game list when you are done. |
+| Controllers on the console's own USB port | That port is the one connected to the computer, so a USB controller cannot be used while the card is mounted. Press B on a controller in the NES port, or eject the drive on the computer. The console restarts afterwards. |
 
 ***
 
