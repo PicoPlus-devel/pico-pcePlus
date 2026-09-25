@@ -1,6 +1,6 @@
 # CHANGELOG
 
-Adds USB drive mode, which shows the SD card on a PC over USB so files can be copied without taking the card out. Also fixes save states for CD-ROM² and SuperGrafx games: a CD save state can now be reloaded after leaving a game and starting it again.
+Adds an **overscan fix** for the menus, for TVs that cut off the edges of the screen, and fits more options on one page of the settings menu.
 
 # General Info
 
@@ -10,6 +10,20 @@ Adds USB drive mode, which shows the SD card on a PC over USB so files can be co
 
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
+
+# v0.7
+
+Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and save states on the SD card are untouched.
+
+## What's new
+
+- **Overscan fix in menu.** A new setting for TVs that cut off the edges of the screen. It leaves the top and bottom rows of the menus blank, and optionally the first and last columns as well. The change is shown right away in the settings menu.
+- **More options on one page in the settings menu.** The color palette is now only shown while one of the menu color options is selected, which leaves room for more options on screen.
+- **Quicker saving in the settings menu.** Press SELECT on any setting to jump straight to the SAVE/CANCEL/DEFAULT row.
+
+## Fixes
+
+- **Controller test screen** shows the controller outline and the list of controllers correctly again.
 
 # v0.6
 

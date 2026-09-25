@@ -280,7 +280,8 @@ the order they appear on screen.
 | Framerate Overlay | Show the frames per second on screen. On HSTX boards the number of video resyncs is shown next to it. |
 | Display Mode | HDMI or DVI output. HSTX boards only. |
 | External Audio | Route audio to the I²S/line-out output instead of HDMI. Only on boards with such an output. Selecting DVI as Display Mode enables this automatically, because DVI carries no audio. |
-| Menu Font Color / Menu Font Back Color | Menu colours (0-63). |
+| Menu Font Color / Menu Font Back Color | Menu colours (0-63). The colour palette is shown while one of these two entries is selected. |
+| Overscan fix in menu | For TVs that cut off the edges of the picture. **Off** (default), **Rows** leaves the top and bottom text rows of the menus blank, **Rows & columns** also leaves the first and last columns blank. The effect is shown while the setting is changed. It applies to the menus only, not to the game picture. |
 | Fruit Jam VU Meter | Let the NeoPixel LEDs follow the audio level. Fruit Jam only. |
 | Fruit Jam Volume Control | Volume of the built-in speaker and the audio jack (-63 to +23 dB). Fruit Jam only. |
 | Overclock | Raise the CPU clock from 252 MHz to 378 MHz. The board reboots to apply the change. Required for SuperGrafx games to run at full speed with audio. HSTX boards only. File browser only, not available in-game. |
@@ -289,7 +290,7 @@ the order they appear on screen.
 | USB Drive Mode | Show the SD card on a computer as a USB drive, so games can be added or removed without taking the card out. See [USB drive mode](#usb-drive-mode). File browser only, not available in-game. |
 
 > [!NOTE]
-> Changes are only applied when **SAVE** is selected. **CANCEL** discards them, **DEFAULT** restores the default values.
+> Changes are only applied when **SAVE** is selected. **CANCEL** discards them, **DEFAULT** restores the default values. Press SELECT on any setting to jump straight to the SAVE/CANCEL/DEFAULT row.
 
 ***
 
