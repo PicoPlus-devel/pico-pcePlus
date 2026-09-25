@@ -121,6 +121,11 @@ const int8_t g_settings_visibility_pce[MOPT_COUNT] = {
     [MOPT_CONTROLLER_TEST]          = 1,                  // Controller Test
     [MOPT_RECENT_GAMES]             = 0,                  // Recently played (menu.cpp force-shows this in the rom browser)
     [MOPT_USB_DRIVE_MODE]           = 0,                  // USB drive mode (menu.cpp force-shows this in the rom browser)
+    [MOPT_CASSETTE]                 = 0,                  // TI-99/4A only
+    [MOPT_DISK]                     = 0,                  // TI-99/4A only
+    [MOPT_SERIAL_KEYBOARD]          = 0,                  // TI-99/4A only
+    [MOPT_SPRITE_LIMIT]             = 0,                  // NES only
+    [MOPT_MENU_OVERSCAN]            = 0,                  // Overscan in menu (menu.cpp force-shows this below the menu colors)
 };
 
 const uint8_t g_available_screen_modes_pce[] = {
