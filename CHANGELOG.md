@@ -11,6 +11,20 @@ Adds an **overscan fix** for the menus, for TVs that cut off the edges of the sc
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
 
+# v0.8
+
+After updating, all settings return to their defaults once. Saves and save states on the SD card are untouched.
+
+## What's new
+
+- **New setting: Video Clock Fix** (boards with HSTX video whose only USB port is the board's own, such as the Pimoroni Pico Plus 2, the Adafruit Metro RP2350 and the Murmulator M2). Turn it on if your TV or monitor shows small dots or lines in the picture with Overclock on. A USB controller can then no longer be used; use a NES, SNES or Wii controller instead. See [Video Clock Fix](https://github.com/PicoPlus-devel/pico-pcePlus#video-clock-fix).
+
+## Fixes
+
+- **The Overclock setting always matches the speed the board runs at.** It could show on while the board ran at the normal speed, or off while the board was still overclocked.
+- **The Controller Test screen is now closed by holding SELECT + UP** for 2 seconds. SELECT + START conflicted with some 8BitDo wireless controllers.
+- **The B button of the AliExpress SNES USB controller works without pressing Y first.**
+
 # v0.7
 
 Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and save states on the SD card are untouched.
