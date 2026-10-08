@@ -21,7 +21,7 @@ fi
 # 	exit 1
 # fi
 # build for Pico 2 -arm-s
-HWCONFIGS="1 2 5 6 7 8 9 10 12 13 14"
+HWCONFIGS="1 2 5 6 7 8 9 10 12 13 14 15"
 for HWCONFIG in $HWCONFIGS
 do
 	./bld.sh -c $HWCONFIG -2 || exit 1
