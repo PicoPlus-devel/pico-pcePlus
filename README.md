@@ -78,6 +78,8 @@ The emulator runs on RP2350-based boards in two configurations:
 
 For board-by-board wiring, supported display modes, and which UF2 file to flash, refer to the [pico-infonesPlus documentation](https://github.com/PicoPlus-devel/pico-infonesPlus#setup). The set of supported boards and their pinouts is identical between the two projects.
 
+This includes the [Olimex RP2040-PICO-PC](https://www.olimex.com/Products/MicroPython/PICO/RP2040-PICO-PC/) with a Raspberry Pi Pico 2, which plays sound through HDMI and its audio jack at the same time; see [Olimex RP2040-PICO-PC](https://github.com/PicoPlus-devel/pico-infonesPlus#olimex-rp2040-pico-pc).
+
 A board and its breakouts can also be built into a finished little console on one of the three [custom PCBs](#custom-pcbs).
 
 ***
@@ -285,12 +287,26 @@ the order they appear on screen.
 | Fruit Jam VU Meter | Let the NeoPixel LEDs follow the audio level. Fruit Jam only. |
 | Fruit Jam Volume Control | Volume of the built-in speaker and the audio jack (-63 to +23 dB). Fruit Jam only. |
 | Overclock | Raise the CPU clock from 252 MHz to 378 MHz. The board reboots to apply the change. Required for SuperGrafx games to run at full speed with audio. HSTX boards only. File browser only, not available in-game. |
-| Controller Test | Show a gamepad graphic that follows the controller a button was last pressed on, plus a list of connected input sources. Useful for checking wiring and button mappings. Hold SELECT + START for 2 seconds to exit. |
+| Video Clock Fix | Turn this on if the TV or monitor shows small dots or lines in the picture at 378 MHz. A USB controller can then no longer be used. HSTX boards without a second USB port only. File browser only, not available in-game. See [Video Clock Fix](#video-clock-fix). |
+| Controller Test | Show a gamepad graphic that follows the controller a button was last pressed on, plus a list of connected input sources. Useful for checking wiring and button mappings. Hold SELECT + UP for 2 seconds to exit. |
 | Enter BOOTSEL Mode | Reboot into BOOTSEL so new firmware can be flashed. |
 | USB Drive Mode | Show the SD card on a computer as a USB drive, so games can be added or removed without taking the card out. See [USB drive mode](#usb-drive-mode). File browser only, not available in-game. |
 
 > [!NOTE]
 > Changes are only applied when **SAVE** is selected. **CANCEL** discards them, **DEFAULT** restores the default values. Press SELECT on any setting to jump straight to the SAVE/CANCEL/DEFAULT row.
+
+### Video Clock Fix
+
+At 378 MHz the HDMI output clock is derived from the CPU clock, and some TVs and monitors then show small dots or short dotted lines in the picture. The emulator runs at that clock when the **Overclock** setting is on, which SuperGrafx games need. Taking the HDMI clock from the clock source of the built-in USB port avoids this, but leaves that port without a usable clock.
+
+- Boards that connect USB controllers to a second USB port, such as the Adafruit Fruit Jam, always do this. Nothing is lost on these boards.
+- Boards with HSTX video whose only USB port is the board's own, such as a Pico 2 or Pimoroni Pico Plus 2 with the Adafruit DVI breakout, the Adafruit Metro RP2350, the Murmulator M2 and the Olimex RP2040-PICO-PC, offer it as a setting: **Video Clock Fix**, in the settings menu of the file browser, below Overclock. It is off by default.
+- Boards with PicoDVI video are not affected and do not offer the setting.
+
+> [!IMPORTANT]
+> With Video Clock Fix enabled, the built-in USB port can no longer be used for a gamepad, keyboard or mouse. Use a NES, SNES or Wii Classic controller on the GPIO controller ports instead; on the Olimex RP2040-PICO-PC, a NES or SNES controller on the UEXT connector. The port still powers the board, and USB drive mode remains available.
+
+The setting can only be enabled while a NES, SNES or Wii Classic controller is detected; otherwise an error message is shown. A SNES controller cannot be detected until a button on it has been pressed. Enabling the setting shows a warning first; confirming it restarts the board. To disable it, set it to OFF in the settings menu. If no working controller is available, delete `settings_PCE.dat` from the root of the SD card on a computer: on the next start the board disables the fix and restarts once.
 
 ***
 
@@ -392,6 +408,7 @@ This project is licensed under the GNU General Public License v3.0. See the [LIC
 - PCB design by [John Edgar Park](https://twitter.com/johnedgarpark).
 - Additional PCB design and 3D-printable cases (for both PCBs and the WaveShare RP2040/RP2350-PiZero) by [Gavin Knight](https://github.com/DynaMight1124).
 - Metadata files provided by [Gavin Knight](https://github.com/DynaMight1124), based on [Ducalex's retro-go-covers](https://github.com/ducalex/retro-go-covers).
+- Olimex RP2040-PICO-PC support, including sound through its audio jack, by [DnCraptor](https://github.com/DnCraptor).
 
 ### Contributions and assistance
 

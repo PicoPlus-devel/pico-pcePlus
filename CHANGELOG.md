@@ -11,6 +11,21 @@ Adds an **overscan fix** for the menus, for TVs that cut off the edges of the sc
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
 
+# v0.8
+
+After updating, all settings return to their defaults once. Saves and save states on the SD card are untouched.
+
+## What's new
+
+- **New setting: Video Clock Fix** (boards with HSTX video whose only USB port is the board's own, such as the Pimoroni Pico Plus 2, the Adafruit Metro RP2350 and the Murmulator M2). Turn it on if your TV or monitor shows small dots or lines in the picture with Overclock on. A USB controller can then no longer be used; use a NES, SNES or Wii controller instead. See [Video Clock Fix](https://github.com/PicoPlus-devel/pico-pcePlus#video-clock-fix).
+- **Olimex RP2040-PICO-PC.** The emulator now runs on the [Olimex RP2040-PICO-PC](https://www.olimex.com/Products/MicroPython/PICO/RP2040-PICO-PC/) with a Raspberry Pi Pico 2: HDMI, sound through HDMI and the audio jack, a USB controller on the USB-A port and a NES or SNES controller on the UEXT connector. See [Olimex RP2040-PICO-PC](https://github.com/PicoPlus-devel/pico-infonesPlus#olimex-rp2040-pico-pc) in the pico-infonesPlus readme. Contributed by [DnCraptor](https://github.com/DnCraptor).
+
+## Fixes
+
+- **The Overclock setting always matches the speed the board runs at.** It could show on while the board ran at the normal speed, or off while the board was still overclocked.
+- **The Controller Test screen is now closed by holding SELECT + UP** for 2 seconds. SELECT + START conflicted with some 8BitDo wireless controllers.
+- **The B button of the AliExpress SNES USB controller works without pressing Y first.**
+
 # v0.7
 
 Upgrading is only a matter of flashing the new `.uf2` — your settings, saves and save states on the SD card are untouched.
@@ -288,6 +303,14 @@ For more info about the Murmulator see https://murmulator.ru/.
 | Board | Binary |
 |:--|:--|
 | Pico 2 / Pico 2 W | [picopcePlus_MurmulatorM2_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_MurmulatorM2_arm.uf2) |
+
+### Olimex RP2040-PICO-PC
+
+| Board | Binary |
+|:--|:--|
+| Pico 2 | [picopcePlus_OlimexPicoPC_arm.uf2](https://github.com/PicoPlus-devel/pico-pcePlus/releases/latest/download/picopcePlus_OlimexPicoPC_arm.uf2) |
+
+There is no Pico 2 W binary for this board.
 
 ### Other downloads
 
