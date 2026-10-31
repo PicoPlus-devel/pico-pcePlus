@@ -20,7 +20,7 @@ This project is part of a family of Raspberry Pi Pico emulator projects:
 ## What it emulates
 
 - **HuCard ROMs** — Standard PC Engine / TurboGrafx-16 cartridge dumps (`.pce`) are loaded directly from the SD card.
-- **SuperGrafx (SGX)** — SuperGrafx titles are recognised and dispatched to the second VDC. SuperGrafx support requires PSRAM, and the board must be overclocked to 378 MHz to reach the correct framerate and audio. Overclocking to 378 MHz is only possible on configurations that use HSTX for video, such as the Adafruit Fruit Jam. PicoDVI configurations like the Waveshare RP2350 PiZero need an exact system clock of 252 MHz to produce 60 fps, which leaves no headroom to overclock for SuperGrafx. On those boards SuperGrafx games run at a reduced framerate and without audio.
+- **SuperGrafx (SGX)** — SuperGrafx titles are recognised and dispatched to the second VDC. SuperGrafx support requires PSRAM, and the board must run at 384 MHz to reach the correct framerate and audio. This is only possible on configurations that use HSTX for video, such as the Adafruit Fruit Jam. On these boards, selecting a SuperGrafx game in the file browser switches the board to 384 MHz, and selecting another game switches it back; the board restarts each time. With **Overclock** on, the board stays at 384 MHz. PicoDVI configurations like the Waveshare RP2350 PiZero need an exact system clock of 252 MHz to produce 60 fps, which leaves no headroom to overclock for SuperGrafx. On those boards SuperGrafx games run at a reduced framerate and without audio.
 - **CD-ROM²** — CD-ROM² and Super CD-ROM² games are supported, including CD-DA audio playback and ADPCM streaming. CD-ROM² playback requires PSRAM and a System Card BIOS supplied by the user.
 - **Audio CDs** — Regular music CDs can be played with the CD player built into the System Card BIOS. Put a CUE/BIN or CHD image of a music CD on the SD card and start it like a CD game: the track list appears and playback, track skip, pause and the level meters all work.
 - **Save states** — Manual save and load slots are available through the in-game menu. An optional auto-save mode stores a state when the game exits and offers to resume it the next time the same ROM is launched. State files are stored on the SD card under `/savestates/PCE/<CRC32>/`.
@@ -63,7 +63,7 @@ Each disc image (and its associated tracks for CUE/BIN) should be placed in its 
 - **Ginga Fukei Densetsu Sapphire** stutters during gameplay: the picture updates at
   roughly half rate in busy scenes. Emulation keeps full speed and audio is
   unaffected. The board needs more time per frame than one frame allows, and the
-  emulated CPU accounts for the difference. Overclocking to 378 MHz improves matters
+  emulated CPU accounts for the difference. Overclocking to 384 MHz improves matters
   but does not remove it. No other CD game is known to be affected. See
   [issue #17](https://github.com/PicoPlus-devel/pico-pcePlus/issues/17).
 
@@ -255,27 +255,13 @@ the order they appear on screen.
 | Overscan fix in menu | For TVs that cut off the edges of the picture. **Off** (default), **Rows** leaves the top and bottom text rows of the menus blank, **Rows & columns** also leaves the first and last columns blank. The effect is shown while the setting is changed. It applies to the menus only, not to the game picture. |
 | Fruit Jam VU Meter | Let the NeoPixel LEDs follow the audio level. Fruit Jam only. |
 | Fruit Jam Volume Control | Volume of the built-in speaker and the audio jack (-63 to +23 dB). Fruit Jam only. |
-| Overclock | Raise the CPU clock from 252 MHz to 378 MHz. The board reboots to apply the change. Required for SuperGrafx games to run at full speed with audio. HSTX boards only. File browser only, not available in-game. |
-| Video Clock Fix | Turn this on if the TV or monitor shows small dots or lines in the picture at 378 MHz. A USB controller can then no longer be used. HSTX boards without a second USB port only. File browser only, not available in-game. See [Video Clock Fix](#video-clock-fix). |
+| Overclock | Raise the CPU clock from 252 MHz to 384 MHz. The board reboots to apply the change. Required for SuperGrafx games to run at full speed with audio. HSTX boards only. File browser only, not available in-game. |
 | Controller Test | Show a gamepad graphic that follows the controller a button was last pressed on, plus a list of connected input sources. Useful for checking wiring and button mappings. Hold SELECT + UP for 2 seconds to exit. |
 | Enter BOOTSEL Mode | Reboot into BOOTSEL so new firmware can be flashed. |
 | USB Drive Mode | Show the SD card on a computer as a USB drive, so games can be added or removed without taking the card out. See [USB drive mode](#usb-drive-mode). File browser only, not available in-game. |
 
 > [!NOTE]
 > Changes are only applied when **SAVE** is selected. **CANCEL** discards them, **DEFAULT** restores the default values. Press SELECT on any setting to jump straight to the SAVE/CANCEL/DEFAULT row.
-
-### Video Clock Fix
-
-At 378 MHz the HDMI output clock is derived from the CPU clock, and some TVs and monitors then show small dots or short dotted lines in the picture. The emulator runs at that clock when the **Overclock** setting is on, which SuperGrafx games need. Taking the HDMI clock from the clock source of the built-in USB port avoids this, but leaves that port without a usable clock.
-
-- Boards that connect USB controllers to a second USB port, such as the Adafruit Fruit Jam, always do this. Nothing is lost on these boards.
-- Boards with HSTX video whose only USB port is the board's own, such as a Pico 2 or Pimoroni Pico Plus 2 with the Adafruit DVI breakout, the Adafruit Metro RP2350, the Murmulator M2 and the Olimex RP2040-PICO-PC, offer it as a setting: **Video Clock Fix**, in the settings menu of the file browser, below Overclock. It is off by default.
-- Boards with PicoDVI video are not affected and do not offer the setting.
-
-> [!IMPORTANT]
-> With Video Clock Fix enabled, the built-in USB port can no longer be used for a gamepad, keyboard or mouse. Use a NES, SNES or Wii Classic controller on the GPIO controller ports instead; on the Olimex RP2040-PICO-PC, a NES or SNES controller on the UEXT connector. The port still powers the board, and USB drive mode remains available.
-
-The setting can only be enabled while a NES, SNES or Wii Classic controller is detected; otherwise an error message is shown. A SNES controller cannot be detected until a button on it has been pressed. Enabling the setting shows a warning first; confirming it restarts the board. To disable it, set it to OFF in the settings menu. If no working controller is available, delete `settings_PCE.dat` from the root of the SD card on a computer: on the next start the board disables the fix and restarts once.
 
 ***
 

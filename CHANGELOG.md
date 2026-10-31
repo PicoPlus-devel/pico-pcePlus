@@ -1,6 +1,6 @@
 # CHANGELOG
 
-**v0.8.2** finds USB controllers at every start on the Adafruit Fruit Jam and other boards with PIO-USB.
+**v0.9** removes the small dots or lines some TVs and monitors showed in the picture with Overclock on, while the built-in USB port keeps working, runs SuperGrafx games at full speed on more boards, and finds USB controllers at every start on the Adafruit Fruit Jam and other boards with PIO-USB.
 
 # General Info
 
@@ -11,10 +11,17 @@
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
 
-# v0.8.2
+# v0.9
+
+## Changes
+
+- **The Video Clock Fix setting has been removed.** It is no longer needed, see below. On a board where it was turned on, a USB controller on the built-in USB port works again.
+- **Overclock** now raises the CPU clock to 384 MHz instead of 378 MHz.
+- **SuperGrafx games on boards without PIO-USB.** On boards with HSTX video and PSRAM whose only USB port is the board's own, such as a Pimoroni Pico Plus 2 with the Adafruit DVI breakout, selecting a SuperGrafx game in the file browser now switches the board to 384 MHz, as on the Adafruit Fruit Jam. These games then run at full speed with sound. The board restarts to switch.
 
 ## Fixes
 
+- **No more dots or lines in the picture with Overclock on.** On boards with HSTX video, some TVs and monitors showed small dots or short dotted lines, for example on dark screens, while Overclock was on. The picture is now clean, and the built-in USB port can still be used for controllers and USB drive mode. Thanks to @szuping for the hint that led to this fix.
 - **USB controllers on the Adafruit Fruit Jam and other boards with PIO-USB are now found at every start.** On boards with an older RP2350 chip they were often not detected.
 
 # v0.8.1
@@ -32,7 +39,7 @@ After updating, all settings return to their defaults once. Saves and save state
 
 ## What's new
 
-- **New setting: Video Clock Fix** (boards with HSTX video whose only USB port is the board's own, such as the Pimoroni Pico Plus 2, the Adafruit Metro RP2350 and the Murmulator M2). Turn it on if your TV or monitor shows small dots or lines in the picture with Overclock on. A USB controller can then no longer be used; use a NES, SNES or Wii controller instead. See [Video Clock Fix](https://github.com/PicoPlus-devel/pico-pcePlus#video-clock-fix).
+- ~~**New setting: Video Clock Fix** (boards with HSTX video whose only USB port is the board's own, such as the Pimoroni Pico Plus 2, the Adafruit Metro RP2350 and the Murmulator M2). Turn it on if your TV or monitor shows small dots or lines in the picture with Overclock on. A USB controller can then no longer be used; use a NES, SNES or Wii controller instead.~~ Removed in v0.9.
 - **Olimex RP2040-PICO-PC.** The emulator now runs on the [Olimex RP2040-PICO-PC](https://www.olimex.com/Products/MicroPython/PICO/RP2040-PICO-PC/) with a Raspberry Pi Pico 2: HDMI, sound through HDMI and the audio jack, a USB controller on the USB-A port and a NES or SNES controller on the UEXT connector. See [Olimex RP2040-PICO-PC](https://github.com/PicoPlus-devel/pico-infonesPlus#olimex-rp2040-pico-pc) in the pico-infonesPlus readme. Contributed by [DnCraptor](https://github.com/DnCraptor).
 
 ## Fixes
