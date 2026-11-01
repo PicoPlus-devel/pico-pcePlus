@@ -18,6 +18,7 @@
 - **The Video Clock Fix setting has been removed.** It is no longer needed, see below. On a board where it was turned on, a USB controller on the built-in USB port works again.
 - **Overclock** now raises the CPU clock to 384 MHz instead of 378 MHz.
 - **SuperGrafx games on boards without PIO-USB.** On boards with HSTX video and PSRAM whose only USB port is the board's own, such as a Pimoroni Pico Plus 2 with the Adafruit DVI breakout, selecting a SuperGrafx game in the file browser now switches the board to 384 MHz, as on the Adafruit Fruit Jam. These games then run at full speed with sound. The board restarts to switch.
+- **USB keyboard in the menus.** Enter selects and Esc goes back.
 
 ## Fixes
 
