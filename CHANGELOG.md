@@ -1,6 +1,6 @@
 # CHANGELOG
 
-**v0.9** removes the small dots or lines some TVs and monitors showed in the picture with Overclock on, while the built-in USB port keeps working, runs SuperGrafx games at full speed on more boards, and finds USB controllers at every start on the Adafruit Fruit Jam and other boards with PIO-USB.
+**v0.9.1** fixes picture drop-outs, most often in CD games, and flickering lines in DVI mode on boards with HSTX video.
 
 # General Info
 
@@ -10,6 +10,18 @@
 
 > [!IMPORTANT]
 > An **RP2350** board is required. The original RP2040 (Pico 1) is not supported.
+
+# v0.9.1
+
+## Changes
+
+- **NES and SNES controllers on the controller ports are now read with the same timing as a real console**, on all boards. Thanks to @javavi.
+- Under pico-bootLoader, the settings menu entry that goes back to the bootloader is now called **Return to boot loader**.
+
+## Fixes
+
+- **The picture no longer drops out in DVI mode.** On boards with HSTX video, with *Display Mode* set to DVI, the picture could randomly drop out, most often in CD games.
+- **No more flickering lines in DVI mode.** On boards with HSTX video, with *Display Mode* set to DVI, now and then a single line was shown shifted to the right for one frame.
 
 # v0.9
 
