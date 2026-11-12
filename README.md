@@ -80,6 +80,10 @@ For board-by-board wiring, supported display modes, and which UF2 file to flash,
 
 This includes the [Olimex RP2040-PICO-PC](https://www.olimex.com/Products/MicroPython/PICO/RP2040-PICO-PC/) with a Raspberry Pi Pico 2, which plays sound through HDMI and its audio jack at the same time; see [Olimex RP2040-PICO-PC](https://github.com/PicoPlus-devel/pico-infonesPlus#olimex-rp2040-pico-pc).
 
+The [Pico Computer 3](https://github.com/UKTailwind/Pico-Computer-3) is supported as well. It has PSRAM on the board, and up to two NES or SNES controllers and a Wii Classic controller connect to its I/O header; see [Pico Computer 3](https://github.com/PicoPlus-devel/pico-infonesPlus#pico-computer-3). Support for this board is new, and its pin assignment may still change.
+
+The [PCB for the Waveshare RP2350-PiZero](https://github.com/PicoPlus-devel/pico-infonesPlus#pcb-with-waveshare-rp2350-pizero), designed by Liu Szuping ([szuping](https://github.com/szuping)), is supported as well. Video goes through the HDMI port of the PCB, and sound through HDMI, or through the audio jack with *External Audio* in the settings menu. Up to two NES or SNES controllers connect to the controller ports of the PCB, or Bluetooth controllers through an ESP32 module running [BlueRetro](https://github.com/darthcloud/blueretro) in its socket. PSRAM is optional and has to be soldered onto the RP2350-PiZero. The PCB design is not yet available.
+
 A board and its breakouts can also be built into a finished little console on one of the [custom PCBs](#custom-pcbs).
 
 ***
@@ -97,6 +101,8 @@ Four community PCB designs turn a supported board and its breakouts into a small
 
 > [!NOTE]
 > The PicoNES v2.6 and v2.8 are shown with a Pimoroni Pico Plus 2. A Raspberry Pi Pico 2 or Pico 2 W can also be fitted.
+
+A fifth design, the [PCB for the Waveshare RP2350-PiZero](https://github.com/PicoPlus-devel/pico-infonesPlus#pcb-with-waveshare-rp2350-pizero) by Liu Szuping, is supported by the emulator, but the design is not yet available.
 
 The PicoNES and PicoNES Mini both have two controller ports, so the second player of a two-player PC Engine game has a pad; the PicoNES Micro is a single-controller design.
 
@@ -244,7 +250,7 @@ the order they appear on screen.
 | Recently played | Open the list of the [last 20 games that were started](#recently-played-games) and start one of them. File browser only, not available in-game. |
 | Quit game | Leave the game and return to the file browser. For CD-ROM² games the Backup RAM (BRAM) is written to the SD card here, and when auto save is enabled a save state is stored as well. In-game only. |
 | Reset game | Reset the running game. In-game only. |
-| Return to emulator selection | Go back to the emulator picker. Only present in [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader) builds. |
+| Return to boot loader | Go back to the emulator picker. Only present in [pico-bootLoader](https://github.com/PicoPlus-devel/pico-bootLoader) builds. |
 | Save/Load State | Save or load the game state in one of five slots or the quick save slot, and switch automatic saving on exit and loading on start on or off. In-game only. |
 | Screen Mode | Cycle the screen modes: 1:1 or 8:7 pixel aspect ratio, each with or without scanlines. On HSTX boards, games that use a resolution wider than 256 pixels are always shown 1:1. |
 | Scanline Type | Simple or LCD style scanlines. HSTX boards only. |
@@ -364,6 +370,8 @@ This project is licensed under the GNU General Public License v3.0. See the [LIC
 - Additional PCB design and 3D-printable cases (for both PCBs and the WaveShare RP2040/RP2350-PiZero) by [Gavin Knight](https://github.com/DynaMight1124).
 - Metadata files provided by [Gavin Knight](https://github.com/DynaMight1124), based on [Ducalex's retro-go-covers](https://github.com/ducalex/retro-go-covers).
 - Olimex RP2040-PICO-PC support, including sound through its audio jack, by [DnCraptor](https://github.com/DnCraptor).
+- Pico Computer 3 support by [javavi](https://github.com/javavi).
+- PCB design for the Waveshare RP2350-PiZero by Liu Szuping ([szuping](https://github.com/szuping)).
 
 ### Contributions and assistance
 
