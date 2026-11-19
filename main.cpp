@@ -20,6 +20,9 @@
 #include "nespad.h"
 #include "wiipad.h"
 #include "FrensHelpers.h"
+// pico-bootLoader attract mode may start this application with a random game from here
+// (bootloader builds only, see pico_shared/attract.h).
+FRENS_ATTRACT_DIRS("/roms/PCE");
 #include "settings.h"
 #include "FrensFonts.h"
 #include "vumeter.h"
@@ -649,6 +652,33 @@ static DWORD prevOtherButtons[2]{};
 // JOY_A=0x01, JOY_B=0x02, JOY_SELECT=0x04, JOY_RUN=0x08
 // JOY_UP=0x10, JOY_RIGHT=0x20, JOY_DOWN=0x40, JOY_LEFT=0x80
 
+#if FRENS_ATTRACT_APP
+// Attract mode, CD games: the System Card waits on its title screen for RUN.
+// Press it for a few frames once a second until the BIOS reads from the disc,
+// which it does only once it has taken the press; the game's own intro is then
+// left alone. Pad 1 only, and never seen by the menu shortcuts below.
+static int attractPressRun()
+{
+    static uint32_t frames = 0;
+    static bool done = false;
+    if (done || !CD.cd_attached || !Frens::attractActive())
+        return 0;
+    if (CD.read_lba != 0)
+    {
+        done = true;
+        printf("Attract mode: the System Card started the disc after %lu frames\n", (unsigned long)frames);
+        return 0;
+    }
+    if (++frames > 30 * 60)
+    {
+        done = true;
+        printf("Attract mode: the System Card did not start the disc\n");
+        return 0;
+    }
+    return (frames >= 90 && frames % 60 < 6) ? JOY_RUN : 0;
+}
+#endif
+
 void readInputAndMapToPCE(DWORD *pdwPad1, DWORD *pdwPad2, DWORD *pdwSystem, bool ignorepushed, char *gamepadType)
 {
     *pdwPad1 = *pdwPad2 = *pdwSystem = 0;
@@ -720,6 +750,10 @@ void readInputAndMapToPCE(DWORD *pdwPad1, DWORD *pdwPad2, DWORD *pdwSystem, bool
 
         // Write combined buttons to PCE joypad registers
         PCE.Joypad.regs[i] = pcebuttons | pcesystem[i];
+#if FRENS_ATTRACT_APP
+        if (i == 0)
+            PCE.Joypad.regs[0] |= attractPressRun();
+#endif
 
         auto p1 = pcesystem[i];
         if (ignorepushed == false)
@@ -1039,6 +1073,20 @@ int main()
             }
             printf("--------------------------------------\n");
         }
+    }
+#endif
+#if FRENS_ATTRACT_APP
+    // Attract mode starts CD games too when /bios/ holds a System Card to boot
+    // them with (attractPressRun() presses its RUN); menu() leaves discs out
+    // otherwise.
+    if (!isFatalError && Frens::attractActive() && Frens::isPsramEnabled())
+    {
+        static char attractBios[FF_MAX_LFN + 8];
+        bios_variant_t variant = BIOS_UNKNOWN;
+        if (cd_find_bios(attractBios, sizeof(attractBios), NULL, &variant) == 0)
+            Frens::attractAllowExtensions(".cue .chd");
+        else
+            printf("Attract mode: no CD BIOS, HuCards only\n");
     }
 #endif
 
