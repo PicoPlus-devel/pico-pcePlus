@@ -13,6 +13,10 @@
 
 # Next release
 
+## What's new
+
+- **Attract mode.** pico-bootLoader's new attract mode can now start the emulator with a random game from `/roms/PCE`. CD games take part too when a System Card BIOS is on the card: attract mode presses RUN on the BIOS screen. Press any button to play that game yourself.
+
 ## Changes
 
 - Built with Pico SDK 2.3.1. This leaves a little more memory free, about 0.4 KB.
